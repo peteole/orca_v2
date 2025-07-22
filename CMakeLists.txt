@@ -32,9 +32,13 @@ set_target_properties(orca PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-# Optional: Copy example data to build directory
-file(COPY example_data DESTINATION ${CMAKE_BINARY_DIR})
+# Optional: Copy test data to build directory (if it exists)
+if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_data)
+    file(COPY tests/test_data DESTINATION ${CMAKE_BINARY_DIR})
+endif()
 
 # Installation rules
 install(TARGETS orca DESTINATION bin)
-install(DIRECTORY example_data/ DESTINATION share/orca/examples)
+if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_data)
+    install(DIRECTORY tests/test_data/ DESTINATION share/orca/examples)
+endif()
