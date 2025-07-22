@@ -190,20 +190,3 @@ The original ORCA algorithm is licensed under GPL-3.0.
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Citation
-
-If you use this software in your research, please cite the original paper:
-
-```bibtex
-@article{hocevar2014combinatorial,
-  title={A combinatorial approach to graphlet counting},
-  author={Ho{\v{c}}evar, Toma{\v{z}} and Dem{\v{s}}ar, Janez},
-  journal={Bioinformatics},
-  volume={30},
-  number={4},
-  pages={559--565},
-  year={2014},
-  publisher={Oxford University Press}
-}
-```
