@@ -57,7 +57,9 @@ jobs:
           pip install cmake setuptools wheel &&
           python -c "import os; os.makedirs('build', exist_ok=True)" &&
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release &&
-          cmake --build build --config Release
+          cmake --build build --config Release &&
+          python setup.py build_py &&
+          python debug_binary.py
         CIBW_TEST_COMMAND: pytest {project}/tests/ -v
         CIBW_TEST_REQUIRES: pytest numpy
         # Force platform wheels by setting wheel tags
@@ -136,6 +138,10 @@ jobs:
         python -c "import os; os.makedirs('build', exist_ok=True)"
         cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
+        python setup.py build_py
+
+    - name: Debug binary location
+      run: python debug_binary.py
 
     - name: Run tests
       run: pytest tests/ -v

@@ -17,13 +17,24 @@ def get_binary_path():
     
     binary_path = binary_dir / binary_name
     
-    # If not found in package directory, try build directory (for development)
+    # If not found in package directory, try multiple build locations (for development/CI)
     if not binary_path.exists():
-        build_dir = Path(__file__).resolve().parent.parent / "build" / "bin"
-        binary_path = build_dir / binary_name
+        possible_paths = [
+            Path(__file__).resolve().parent.parent / "build" / "bin" / binary_name,
+            Path(__file__).resolve().parent.parent / "build" / binary_name,
+            Path(__file__).resolve().parent.parent / "build" / "Release" / binary_name,  # Windows MSVC
+            Path(__file__).resolve().parent.parent / "build" / "Debug" / binary_name,    # Windows MSVC Debug
+        ]
+        
+        for path in possible_paths:
+            if path.exists():
+                binary_path = path
+                break
     
     if not binary_path.exists():
-        raise FileNotFoundError(f"ORCA binary not found at {binary_path}")
+        raise FileNotFoundError("ORCA binary not found. Searched locations:\n" +
+                              f"- Package directory: {binary_dir / binary_name}\n" +
+                              f"- Build directories: {[str(p) for p in possible_paths]}")
     
     return binary_path
 
