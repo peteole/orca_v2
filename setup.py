@@ -6,7 +6,13 @@ import sys
 from pathlib import Path
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
-from setuptools.command.bdist_wheel import bdist_wheel
+
+# Import bdist_wheel conditionally since it might not be available
+try:
+    from setuptools.command.bdist_wheel import bdist_wheel
+    HAVE_WHEEL = True
+except ImportError:
+    HAVE_WHEEL = False
 
 
 class BuildBinaryCommand(build_py):
@@ -74,23 +80,32 @@ class BuildBinaryCommand(build_py):
             sys.exit(1)
 
 
-class CustomBdistWheel(bdist_wheel):
-    """Custom wheel build command that ensures platform-specific wheel."""
-    
-    def finalize_options(self):
-        super().finalize_options()
-        # Force platform-specific wheel since we include a binary
-        self.root_is_pure = False
-        # Ensure this is treated as a platlib (platform library) package
-        self.plat_name_supplied = True
-    
-    def get_tag(self):
-        # Force platform-specific tag
-        python, abi, plat = super().get_tag()
-        if plat == "any":
-            from distutils.util import get_platform
-            plat = get_platform().replace('-', '_').replace('.', '_')
-        return python, abi, plat
+if HAVE_WHEEL:
+    class CustomBdistWheel(bdist_wheel):
+        """Custom wheel build command that ensures platform-specific wheel."""
+        
+        def finalize_options(self):
+            super().finalize_options()
+            # Force platform-specific wheel since we include a binary
+            self.root_is_pure = False
+            # Ensure this is treated as a platlib (platform library) package
+            self.plat_name_supplied = True
+        
+        def get_tag(self):
+            # Force platform-specific tag
+            python, abi, plat = super().get_tag()
+            if plat == "any":
+                try:
+                    from distutils.util import get_platform
+                    plat = get_platform().replace('-', '_').replace('.', '_')
+                except ImportError:
+                    import sysconfig
+                    plat = sysconfig.get_platform().replace('-', '_').replace('.', '_')
+            return python, abi, plat
+else:
+    # Dummy class when wheel is not available
+    class CustomBdistWheel:
+        pass
 
 
 if __name__ == "__main__":
@@ -102,10 +117,14 @@ if __name__ == "__main__":
         optional=True
     )
     
+    # Prepare cmdclass based on what's available
+    cmdclass = {
+        'build_py': BuildBinaryCommand,
+    }
+    if HAVE_WHEEL:
+        cmdclass['bdist_wheel'] = CustomBdistWheel
+    
     setup(
         ext_modules=[dummy_ext],
-        cmdclass={
-            'build_py': BuildBinaryCommand,
-            'bdist_wheel': CustomBdistWheel,
-        },
+        cmdclass=cmdclass,
     )
