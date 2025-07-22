@@ -55,7 +55,11 @@ packages = ["orca"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-"*" = ["*.so", "*.dll", "*.dylib", "orca", "orca.exe"]
+"orca" = ["orca", "orca.exe", "*.so", "*.dll", "*.dylib"]
+
+[tool.wheel]
+# Force platform-specific wheels
+universal = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

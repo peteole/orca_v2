@@ -64,6 +64,10 @@ jobs:
           cd ..
         CIBW_TEST_COMMAND: pytest {project}/tests/ -v
         CIBW_TEST_REQUIRES: pytest numpy
+        # Force platform wheels by setting wheel tags
+        CIBW_ENVIRONMENT_LINUX: "SETUPTOOLS_EXT_SUFFIX=.so"
+        CIBW_ENVIRONMENT_MACOS: "SETUPTOOLS_EXT_SUFFIX=.so" 
+        CIBW_ENVIRONMENT_WINDOWS: "SETUPTOOLS_EXT_SUFFIX=.pyd"
       run: python -m cibuildwheel --output-dir wheelhouse
 
     - uses: actions/upload-artifact@v4
