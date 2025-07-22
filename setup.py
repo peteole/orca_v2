@@ -4,7 +4,7 @@ import platform
 import subprocess
 import sys
 from pathlib import Path
-from setuptools import setup
+from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
 from setuptools.command.bdist_wheel import bdist_wheel
 
@@ -81,6 +81,8 @@ class CustomBdistWheel(bdist_wheel):
         super().finalize_options()
         # Force platform-specific wheel since we include a binary
         self.root_is_pure = False
+        # Ensure this is treated as a platlib (platform library) package
+        self.plat_name_supplied = True
     
     def get_tag(self):
         # Force platform-specific tag
@@ -92,7 +94,16 @@ class CustomBdistWheel(bdist_wheel):
 
 
 if __name__ == "__main__":
+    # Create a dummy extension to force platform-specific wheel
+    # This ensures the wheel is treated as platlib instead of purelib
+    dummy_ext = Extension(
+        name='orca._dummy',
+        sources=['orca/_dummy.c'],
+        optional=True
+    )
+    
     setup(
+        ext_modules=[dummy_ext],
         cmdclass={
             'build_py': BuildBinaryCommand,
             'bdist_wheel': CustomBdistWheel,

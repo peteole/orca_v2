@@ -1,5 +1,5 @@
 import sys
-from typing import Literal
+from typing import Literal, Optional
 import numpy as np
 import tempfile
 import subprocess
@@ -7,17 +7,30 @@ from pathlib import Path
 
 
 def get_binary_path():
-    build_dir = Path(__file__).resolve().parent.parent / "build" / "bin"
+    """Get path to the ORCA binary bundled with the package."""
+    # Look for binary in the same directory as this module
+    binary_dir = Path(__file__).resolve().parent
+    
     # Get if the current platform is Windows
     is_windows = Path(sys.executable).suffix == ".exe"
-    if is_windows:
-        return build_dir / "orca.exe"
-    return build_dir / "orca"
+    binary_name = "orca.exe" if is_windows else "orca"
+    
+    binary_path = binary_dir / binary_name
+    
+    # If not found in package directory, try build directory (for development)
+    if not binary_path.exists():
+        build_dir = Path(__file__).resolve().parent.parent / "build" / "bin"
+        binary_path = build_dir / binary_name
+    
+    if not binary_path.exists():
+        raise FileNotFoundError(f"ORCA binary not found at {binary_path}")
+    
+    return binary_path
 
 
 def run_orca(
     edge_list: np.ndarray,
-    num_nodes: int | None = None,
+    num_nodes: Optional[int] = None,
     mode: Literal["node", "edge"] = "node",
     graphlet_size: Literal[4, 5] = 4,
     debug: bool = False,
@@ -54,7 +67,7 @@ def run_orca(
 
 def orca_nodes(
     edge_list: np.ndarray,
-    num_nodes: int | None = None,
+    num_nodes: Optional[int] = None,
     graphlet_size: Literal[4, 5] = 4,
     debug: bool = False,
 ) -> np.ndarray:
@@ -62,7 +75,7 @@ def orca_nodes(
 
 def orca_edges(
     edge_list: np.ndarray,
-    num_nodes: int | None = None,
+    num_nodes: Optional[int] = None,
     graphlet_size: Literal[4, 5] = 4,
     debug: bool = False,
 ) -> np.ndarray:
