@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "orca-graphlets"
-version = "0.1.3"
+version = "0.1.4"
 description = "ORCA: Python wrapper for efficient graphlet counting"
 readme = "README.md"
 requires-python = ">=3.8"
