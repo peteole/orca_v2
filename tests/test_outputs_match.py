@@ -16,8 +16,4 @@ def test_outputs_match():
         expected_output_file = test_data_dir / f"{mode}{graphlet_size}.out"
         expected_output = np.loadtxt(expected_output_file, dtype=int)
         actual_output = run_orca(edges, num_nodes=num_nodes, mode=mode, graphlet_size=graphlet_size)
-        try:
-            np.testing.assert_array_equal(actual_output, expected_output)
-        except AssertionError:
-            print(f"Output mismatch for {mode} {graphlet_size}")
-            np.savetxt(test_data_dir / f"actual_{mode}{graphlet_size}.out", actual_output, fmt="%d")
+        np.testing.assert_array_equal(actual_output, expected_output)
