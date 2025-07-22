@@ -1,8 +1,0 @@
-include README.md
-include CMakeLists.txt
-include src/orca.cpp
-include orca/_dummy.c
-recursive-include orca *.so *.dll *.dylib orca orca.exe
-recursive-include tests/test_data *
-prune build
-prune .git
